@@ -10,11 +10,149 @@ jobs:
           channel: 'stable'
       - run: |
           flutter create --project-name=transformation app
-          if [ -f "lib/main.dart" ]; then
-            cp lib/main.dart app/lib/main.dart
-          elif [ -f "main.dart" ]; then
-            cp main.dart app/lib/main.dart
-          fi
+          cat << 'EOF' > app/lib/main.dart
+          import 'package:flutter/material.dart';
+
+          void main() {
+            runApp(const TransformationApp());
+          }
+
+          class TransformationApp extends StatelessWidget {
+            const TransformationApp({super.key});
+
+            @override
+            Widget build(BuildContext context) {
+              return MaterialApp(
+                title: '60 ДНЕЙ ТРАНСФОРМАЦИИ',
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData.dark().copyWith(
+                  scaffoldBackgroundColor: const Color(0xFF0A0A0A),
+                  primaryColor: const Color(0xFFF1E270),
+                  colorScheme: const ColorScheme.dark(
+                    primary: Color(0xFFF1E270),
+                    surface: Color(0xFF141414),
+                  ),
+                ),
+                home: const DashboardScreen(),
+              );
+            }
+          }
+
+          class HabitItem {
+            final String id;
+            final String title;
+            final String subtitle;
+            final IconData icon;
+            bool isCompleted;
+
+            HabitItem({
+              required this.id,
+              required this.title,
+              required this.subtitle,
+              required this.icon,
+              this.isCompleted = false,
+            });
+          }
+
+          class DashboardScreen extends StatefulWidget {
+            const DashboardScreen({super.key});
+
+            @override
+            State<DashboardScreen> createState() => _DashboardScreenState();
+          }
+
+          class _DashboardScreenState extends State<DashboardScreen> {
+            int currentDay = 1;
+            late List<HabitItem> _tasks;
+
+            @override
+            void initState() {
+              super.initState();
+              _initTasks();
+            }
+
+            void _initTasks() {
+              _tasks = [
+                HabitItem(
+                  id: 'sport',
+                  title: 'Спорт и Тело (1 ЧАС / 60 МИН)',
+                  subtitle: 'Бег, силовая или функционал',
+                  icon: Icons.fitness_center,
+                ),
+                HabitItem(
+                  id: 'read',
+                  title: 'Чтение (20 страниц)',
+                  subtitle: 'Развивающая литература',
+                  icon: Icons.menu_book,
+                ),
+                HabitItem(
+                  id: 'water',
+                  title: 'Дисциплина и Вода (3L)',
+                  subtitle: 'Без сахара и фастфуда',
+                  icon: Icons.water_drop,
+                ),
+                HabitItem(
+                  id: 'cold',
+                  title: 'Контрастный душ',
+                  subtitle: 'Закаливание каждое утро',
+                  icon: Icons.ac_unit,
+                ),
+              ];
+            }
+
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                appBar: AppBar(
+                  backgroundColor: const Color(0xFF141414),
+                  title: const Text('60 DAYS // HARDCORE', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                  centerTitle: true,
+                ),
+                body: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF141414),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFF1E270), width: 1.5),
+                        ),
+                        child: Column(
+                          children: [
+                            Text('ДЕНЬ $currentDay ИЗ 60', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.black, color: Color(0xFFF1E270))),
+                            const SizedBox(height: 8),
+                            LinearProgressIndicator(value: currentDay / 60, backgroundColor: Colors.white10, color: const Color(0xFFF1E270), minHeight: 8),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text('ЕЖЕДНЕВНЫЕ ДИСЦИПЛИНЫ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
+                      const SizedBox(height: 10),
+                      ..._tasks.map((task) => Card(
+                        color: const Color(0xFF141414),
+                        margin: const EdgeInsets.only(bottom: 10),
+                        child: CheckboxListTile(
+                          title: Text(task.title, style: TextStyle(fontWeight: FontWeight.bold, decoration: task.isCompleted ? TextDecoration.lineThrough : null)),
+                          subtitle: Text(task.subtitle, style: const TextStyle(color: Colors.grey)),
+                          value: task.isCompleted,
+                          activeColor: const Color(0xFFF1E270),
+                          checkColor: Colors.black,
+                          onChanged: (val) {
+                            setState(() {
+                              task.isCompleted = val ?? false;
+                            });
+                          },
+                        ),
+                      )),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }
+          EOF
           cd app
           flutter build apk --release --no-tree-shake-icons
       - uses: actions/upload-artifact@v4
