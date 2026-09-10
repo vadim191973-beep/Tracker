@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,9 +14,9 @@ class TransformationApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF0A0A0A),
-        primaryColor: const Color(0xFFFF1E27),
+        primaryColor: const Color(0xFFF1E270),
         colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFFF1E27),
+          primary: Color(0xFFF1E270),
           surface: Color(0xFF141414),
         ),
       ),
@@ -50,18 +49,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int currentDay = 12;
-  double totalEarnings = 145000.0;
-  double todayEarnings = 0.0;
-  final TextEditingController _earningsController = TextEditingController();
-
-  int _workoutSeconds = 3600;
-  Timer? _timer;
-  bool _isTimerRunning = false;
-
-  bool _isPlayingMusic = false;
-  final String _currentTrack = "Mick Gordon - Rip & Tear (Doom OST)";
-
+  int currentDay = 1;
   late List<HabitItem> _tasks;
 
   @override
@@ -75,430 +63,76 @@ class _DashboardScreenState extends State<DashboardScreen> {
       HabitItem(
         id: 'sport',
         title: 'Спорт и Тело (1 ЧАС / 60 МИН)',
-        subtitle: 'Бег, силовая или тяжелый функционал',
+        subtitle: 'Бег, силовая или функционал',
         icon: Icons.fitness_center,
       ),
       HabitItem(
-        id: 'nutrition',
-        title: 'Чистая Еда и Вода',
-        subtitle: 'Без сахара, джанк-фуда и алкоголя. 3л воды',
-        icon: Icons.restaurant,
-      ),
-      HabitItem(
-        id: 'income',
-        title: 'Заработок и Продажи',
-        subtitle: '1 ключевое действие для роста дохода',
-        icon: Icons.attach_money,
-      ),
-      HabitItem(
-        id: 'reading',
-        title: 'Чтение и Инсайты (20 стр)',
-        subtitle: 'Профильная литература + конспект',
+        id: 'read',
+        title: 'Чтение (20 страниц)',
+        subtitle: 'Развивающая литература',
         icon: Icons.menu_book,
       ),
       HabitItem(
-        id: 'discipline',
-        title: 'Режим и Детокс',
-        subtitle: 'Подъем до 07:00, без соцсетей за 1ч до сна',
-        icon: Icons.bedtime,
+        id: 'water',
+        title: 'Дисциплина и Вода (3L)',
+        subtitle: 'Без сахара и фастфуда',
+        icon: Icons.water_drop,
       ),
       HabitItem(
-        id: 'mindset',
-        title: 'Вечерняя Рефлексия',
-        subtitle: '3 главных вывода за день и самопроверка',
-        icon: Icons.psychology,
+        id: 'cold',
+        title: 'Контрастный душ',
+        subtitle: 'Закаливание каждое утро',
+        icon: Icons.ac_unit,
       ),
     ];
   }
 
-  void _toggleWorkoutTimer() {
-    if (_isTimerRunning) {
-      _timer?.cancel();
-      setState(() => _isTimerRunning = false);
-    } else {
-      setState(() => _isTimerRunning = true);
-      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (_workoutSeconds > 0) {
-          setState(() => _workoutSeconds--);
-        } else {
-          _timer?.cancel();
-          setState(() {
-            _isTimerRunning = false;
-            _tasks.firstWhere((t) => t.id == 'sport').isCompleted = true;
-          });
-        }
-      });
-    }
-  }
-
-  void _triggerHardcoreReset() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1A0505),
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(color: Color(0xFFFF1E27), width: 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        title: const Text(
-          '🚨 ПРОВАЛ ДИСЦИПЛИНЫ',
-          style: TextStyle(color: Color(0xFFFF1E27), fontWeight: FontWeight.bold),
-        ),
-        content: const Text(
-          'Ты нарушил условия марафона или пропустил задачу.\n\nПрогресс аннулируется. Счетчик сбрасывается на ДЕНЬ 1.',
-          style: TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('ОТМЕНА', style: TextStyle(color: Colors.white54)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF1E27),
-            ),
-            onPressed: () {
-              setState(() {
-                currentDay = 1;
-                todayEarnings = 0;
-                _earningsController.clear();
-                _workoutSeconds = 3600;
-                _isTimerRunning = false;
-                _timer?.cancel();
-                for (var t in _tasks) {
-                  t.isCompleted = false;
-                }
-              });
-              Navigator.pop(ctx);
-            },
-            child: const Text('ОБНУЛИТЬ ВСЁ', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _submitEarnings(String value) {
-    final amount = double.tryParse(value) ?? 0.0;
-    setState(() {
-      totalEarnings += (amount - todayEarnings);
-      todayEarnings = amount;
-      _tasks.firstWhere((t) => t.id == 'income').isCompleted = amount > 0;
-    });
-  }
-
-  String _formatTimer(int seconds) {
-    final mins = (seconds ~/ 60).toString().padLeft(2, '0');
-    final secs = (seconds % 60).toString().padLeft(2, '0');
-    return "$mins:$secs";
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _earningsController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    int completedCount = _tasks.where((t) => t.isCompleted).length;
-    double progressRatio = completedCount / _tasks.length;
-
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF101010),
-        elevation: 0,
-        title: const Text(
-          '60 DAYS // HARDCORE',
-          style: TextStyle(
-            color: Color(0xFFFF1E27),
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.restart_alt, color: Color(0xFFFF1E27)),
-            onPressed: _triggerHardcoreReset,
-            tooltip: 'Сброс на День 1',
-          )
-        ],
+        backgroundColor: const Color(0xFF141414),
+        title: const Text('60 DAYS // HARDCORE', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        centerTitle: true,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              decoration: BoxDecoration(
-                color: const Color(0x26FF1E27),
-                border: Border.all(color: const Color(0xFFFF1E27), width: 1.5),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.warning_amber_rounded, color: Color(0xFFFF1E27)),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'ЖЕСТКИЙ РЕЖИМ: 1 ПРОПУСК = СБРОС НА ДЕНЬ 1',
-                      style: TextStyle(
-                        color: Color(0xFFFF1E27),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: const Color(0xFF141414),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white10),
+                border: Border.all(color: const Color(0xFFF1E270), width: 1.5),
               ),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'ДЕНЬ $currentDay / 60',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Выполнено дисциплин: $completedCount из ${_tasks.length}',
-                            style: const TextStyle(color: Colors.white54, fontSize: 13),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0x1AFF1E27),
-                          border: Border.all(color: const Color(0xFFFF1E27)),
-                        ),
-                        child: Text(
-                          '${(progressRatio * 100).toInt()}%',
-                          style: const TextStyle(
-                            color: Color(0xFFFF1E27),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  LinearProgressIndicator(
-                    value: progressRatio,
-                    backgroundColor: Colors.white12,
-                    color: const Color(0xFFFF1E27),
-                    minHeight: 8,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF141414),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'ВНИМАНИЕ К КАПИТАЛУ',
-                        style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'Всего: ${totalEarnings.toStringAsFixed(0)} ₽',
-                        style: const TextStyle(color: Color(0xFFFF1E27), fontWeight: FontWeight.bold, fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _earningsController,
-                          keyboardType: TextInputType.number,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          decoration: InputDecoration(
-                            hintText: 'Заработано за сегодня (₽)',
-                            hintStyle: const TextStyle(color: Colors.white30, fontSize: 13),
-                            filled: true,
-                            fillColor: const Color(0xFF0A0A0A),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.white24),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Color(0xFFFF1E27)),
-                            ),
-                          ),
-                          onSubmitted: _submitEarnings,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF1E27),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                        onPressed: () => _submitEarnings(_earningsController.text),
-                        child: const Text('ВВОД', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF141414),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0x66FF1E27)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.timer_outlined, color: Color(0xFFFF1E27), size: 36),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('ТАЙМЕР ТРЕНИРОВКИ (1 ЧАС)', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                        Text(
-                          _formatTimer(_workoutSeconds),
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    iconSize: 36,
-                    icon: Icon(
-                      _isTimerRunning ? Icons.pause_circle_filled : Icons.play_circle_filled,
-                      color: const Color(0xFFFF1E27),
-                    ),
-                    onPressed: _toggleWorkoutTimer,
-                  )
+                  Text('ДЕНЬ $currentDay ИЗ 60', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.black, color: Color(0xFFF1E270))),
+                  const SizedBox(height: 8),
+                  LinearProgressIndicator(value: currentDay / 60, backgroundColor: Colors.white10, color: const Color(0xFFF1E270), minHeight: 8),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'ЕЖЕДНЕВНЫЕ ДИСЦИПЛИНЫ',
-              style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.5),
-            ),
-            const SizedBox(height: 8),
-            ..._tasks.map((task) {
-              return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF141414),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: task.isCompleted ? const Color(0x80FF1E27) : Colors.white10,
-                  ),
-                ),
-                child: CheckboxListTile(
-                  activeColor: const Color(0xFFFF1E27),
-                  checkColor: Colors.black,
-                  value: task.isCompleted,
-                  onChanged: (val) {
-                    setState(() {
-                      task.isCompleted = val ?? false;
-                    });
-                  },
-                  secondary: Icon(task.icon, color: task.isCompleted ? const Color(0xFFFF1E27) : Colors.white30),
-                  title: Text(
-                    task.title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
-                  subtitle: Text(
-                    task.subtitle,
-                    style: const TextStyle(color: Colors.white38, fontSize: 12),
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF000000),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white12),
+            const Text('ЕЖЕДНЕВНЫЕ ДИСЦИПЛИНЫ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
+            const SizedBox(height: 10),
+            ..._tasks.map((task) => Card(
+              color: const Color(0xFF141414),
+              margin: const EdgeInsets.only(bottom: 10),
+              child: CheckboxListTile(
+                title: Text(task.title, style: TextStyle(fontWeight: FontWeight.bold, decoration: task.isCompleted ? TextDecoration.lineThrough : null)),
+                subtitle: Text(task.subtitle, style: const TextStyle(color: Colors.grey)),
+                value: task.isCompleted,
+                activeColor: const Color(0xFFF1E270),
+                checkColor: Colors.black,
+                onChanged: (val) {
+                  setState(() {
+                    task.isCompleted = val ?? false;
+                  });
+                },
               ),
-              child: Row(
-                children: [
-                  const Icon(Icons.music_note, color: Color(0xFFFF1E27)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('HARDCORE AUDIO BOOST', style: TextStyle(color: Color(0xFFFF1E27), fontSize: 10, fontWeight: FontWeight.bold)),
-                        Text(
-                          _currentTrack,
-                          style: const TextStyle(color: Colors.white70, fontSize: 12),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(_isPlayingMusic ? Icons.pause : Icons.play_arrow, color: Colors.white),
-                    onPressed: () {
-                      setState(() {
-                        _isPlayingMusic = !_isPlayingMusic;
-                      });
-                    },
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
+            )),
           ],
         ),
       ),
