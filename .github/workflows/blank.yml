@@ -19,10 +19,151 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Build APK
+      - name: Create Flutter Project and Build APK
         run: |
+          rm -rf app
           flutter create --project-name=transformation app
-          echo "aW1wb3J0ICdwYWNrYWdlOmZsdXR0ZXIvbWF0ZXJpYWwuZGFydCc7Cgp2b2lkIG1haW4oKSB7CiAgcnVuQXBwKGNvbnN0IFRyYW5zZm9ybWF0aW9uQXBwKCkpOwp9CgpjbGFzcyBUcmFuc2Zvcm1hdGlvbkFwcCBleHRlbmRzIFN0YXRlbGVzc1dpZGdldCB7CiAgY29uc3QgVHJhbnNmb3JtYXRpb25BcHAoe3N1cGVyLmtleX0pOwoKICBAb3ZlcnJpZGUKICBXaWRnZXQgYnVpbGQoQnVpbGRDb250ZXh0IGNvbnRleHQpIHsKICAgIHJldHVybiBNYXRlcmlhbEFwcCgKICAgICAgdGl0bGU6ICc2MCDQlNCdRUININCiACOUNTNNCk0J3QodCkINCe0KDQnNCQ0KbQmNCYJywKICAgICAgZGVidWdTaG93Q2hlY2tlZE1vZGVCYW5uZXI6IGZhbHNlLAogICAgICB0aGVtZTogVGhlbWVEYXRhLmRhcmsoKS5jb3B5V2l0aCgKICAgICAgICBzY2FmZm9sZEJhY2tncm91bmRDb2xvcjogY29uc3QgQ29sb3IoMHgwRjBBMEEwQSksCiAgICAgICAgcHJpbWFyeUNvbG9yOiBjb25zdCBDb2xvcigweEZGMUUyNzApLAogICAgICAgIGNvbG9yU2NoZW1lOiBjb25zdCBDb2xvclNjaGVtZS5kYXJrKAogICAgICAgICAgcHJpbWFyeTogQ29sb3IoMHg4RkYxRTI3MCksCiAgICAgICAgICBzdXJmYWNlOiBDb2xvcigweEZGMTQxNDE0KSwKICAgICAgICApLAogICAgICApLAogICAgICBob21lOiBjb25zdCBEYXNoYm9hcmRTY3JlZW4oKSwKICAgICk7CiAgfQp9CgpjbGFzcyBIYWJpdEl0ZW0gewogIGZpbmFsIFN0cmluZyBpZDsKICBmaW5hbCBTdHJpbmcgdGl0bGU7CiAgZmluYWwgU3RyaW5nIHN1YnRpdGxlOwogIGZpbmFsIEljb25EYXRhIGljb247CiAgYm9vbCBpc0NvbXBsZXRlZDsKCiAgSGFiaXRJdGVtKHsKICAgIHJlcXVpcmVkIHRoaXMuaWQsCiAgICByZXF1aXJlZCB0aGlzLnRpdGxlLAogICAgcmVxdWlyZWQgdGhpcy5zdWJ0aXRsZSwKICAgIHJlcXVpcmVkIHRoaXMuaWNvbiwKICAgIHRoaXMuaXNDb21wbGV0ZWQgPSBmYWxzZSwKICB9KTsKfQoKY2xhc3MgRGFzaGJvYXJkU2NyZWVuIGV4dGVuZHMgU3RhdGVmdWxXaWRnZXQgewogIGNvbnN0IERhc2hib2FyZFNjcmVlbih7c3VwZXIua2V5fSk7CgogIEBvdmVycmlkZQogIFN0YXRlPERhc2hib2FyZFNjcmVlbj4gY3JlYXRlU3RhdGUoKSA9PiBfRGFzaGJvYXJkU2NyZWVuU3RhdGUoKTsKfQoKY2xhc3MgX0Rhc2hib2FyZFNjcmVlblN0YXRlIGV4dGVuZHMgU3RhdGVmdWxXaWRnZXQgewogIGludCBjdXJyZW50RGF5ID0gMTsKICBsYXRlIExpc3Q8SGFiaXRJdGVtPiBfdGFza3M7CgogIEBvdmVycmlkZQogIHZvaWQgaW5pdFN0YXRlKCkgewogICAgc3VwZXIuaW5pdFN0YXRlKCk7CiAgICBfaW5pdFRhc2tzKCk7CiAgfQoKICB2b2lkIF9pbml0VGFza3MoKSB7CiAgICBfdGFza3MgPSBbCiAgICAgIEhhYml0SXRlbSgKICAgICAgICBpZDogJ3Nwb3J0JywKICAgICAgICB0aXRsZTogJ9Ch0L_QvtGA0YIg0Lgg0KLQtdC70L8gKDEg0KfQkNCfIC8gNjAg0JzQmNCdKScsCiAgICAgICAgc3VidGl0bGU6ICfQkdC10LMsINGB0LjQu9C-0LLQsNGPINGC0LDRg9C60Lgg0YTRg9C90LrRhtC40L7QvdCw0LsnLAogICAgICAgIGljb246IEljb25zLmZpdG5lc3NfY2VudGVyLAogICAgICApLAogICAgICBIYWJpdEl0ZW0oCiAgICAgICAgaWQ6ICdyZWFkJywKICAgICAgICB0aXRsZTogJ9Cn0YLQtdC90LjQtSAoMjAg0YHRgtGA0LDQvdC40YYpJywKICAgICAgICBzdWJ0aXRsZTogJ9Cg0LDQt9Cy0LjQstCw0Y8g0LvQuNGC0LXRgNCw0YLRg9GA0LAnLAogICAgICAgIGljb246IEljb25zLm1lbnVfYm9vaywKICAgICAgKSwKICAgICAgSGFiaXRJdGVtKAogICAgICAgIGlkOiAnd2F0ZXInLAogICAgICAgIHRpdGxlOiAn0JTQuNGB0YbQuNC_0LvQuNC90LAg0Lgg0JLQvtC00LAgKDNMKScsCiAgICAgICAgc3VidGl0bGU6ICfQkdC10Lcg0YHQtdGF0LDRgNCwINC4INGE0LDRgdGC0YLRg9C00LAnLAogICAgICAgIGljb246IEljb25zLndhdGVyX2Ryb3AsCiAgICAgICksCiAgICAgIEhhYml0SXRlbSgKICAgICAgICBpZDogJ2NvbGQnLAogICAgICAgIHRpdGxlOiAn0JrQvtC90YLRgNCw0YHRgtC90YvRig0LLTg9GIJywKICAgICAgICBzdWJ0aXRsZTogJ9CX0LDQutCw0LvQuNCy0LLRgNC90LjQtSDQutCw0LbRgtC-0LUg0YPRgtGA0LAnLAogICAgICAgIGljb246IEljb25zLmFjX3VuaXQsCiAgICAgICksCiAgICBdOwogIH0KCiAgQG92ZXJyaWRlCiAgV2lkZ2V0IGJ1aWxkKEJ1aWxkQ29udGV4dCBjb25zdGV4dCkgewogICAgcmV0dXJuIFNjYWZmb2xkKAogICAgICBhcHBCYXI6IEFwcEJhcigKICAgICAgICBiYWNrZ3JvdW5kQ29sb3I6IGNvbnN0IENvbG9yKDB4RkYxNDE0MTQpLAogICAgICAgIHRpdGxlOiBjb25zdCBUZXh0KCc2MCBEQVlTIC8vIEhBUkRDT1JFJywgc3R5bGU6IFRleHRTdHlsZShmb250V2VpZ2h0OiBGb250V2VpZ2h0LmJvbGQsIGxldHRlclNwYWNpbmc6IDEuNSkpLAogICAgICAgIGNlbnRlclRpdGxlOiB0cnVlLAogICAgICApLAogICAgICBib2R5OiBQYWRkaW5nKAogICAgICAgIHBhZGRpbmc6IGNvbnN0IEVkZ2VJbnNldHMuYWxsKDE2LjApLAogICAgICAgIGNoaWxkOiBMaXN0VmlldygKICAgICAgICAgIGNoaWxkcmVuOiBbCiAgICAgICAgICAgIENvbnRhaW5lcigKICAgICAgICAgICAgICBwYWRkaW5nOiBjb25zdCBFZGdlSW5zZXRzLmFsbCgyMCksCiAgICAgICAgICAgICAgZGVjb3JhdGlvbjogQm94RGVjb3JhdGlvbigKICAgICAgICAgICAgICAgIGNvbG9yOiBjb25zdCBDb2xvcigweEZGMTQxNDE0KSwKICAgICAgICAgICAgICAgIGJvcmRlclJhZGl1czogQm9yZGVyUmFkaXVzLmNpcmN1bGFyKDEyKSwKICAgICAgICAgICAgICAgIGJvcmRlcjogQm9yZGVyLmFsbChjb2xvcjogY29uc3QgQ29sb3IoMHg4RkYxRTI3MCksIHdpZHRoOiAxLjUpLAogICAgICAgICAgICAgICksCiAgICAgICAgICAgICAgY2hpbGQ6IENvbHVtbigKICAgICAgICAgICAgICAgIGNoaWxkcmVuOiBbCiAgICAgICAgICAgICAgICAgIFRleHQoJ9CU0JXQndGMINGBY3VycmVudERheSDQmNCXIDYwJywgc3R5bGU6IGNvbnN0IFRleHRTdHlsZShmb250U2l6ZTogMjQsIGZvbnRXZWlnaHQ6IEZvbnRXZWlnaHQuYmxhY2ssIGNvbG9yOiBDb2xvcigweDhGRjFFMjcwKSkpLAogICAgICAgICAgICAgICAgICBjb25zdCBTaXplZEJveChoZWlnaHQ6IDgpLAogICAgICAgICAgICAgICAgICBMaW5lYXJQcm9ncmVzc0luZGljYXRvcih2YWx1ZTogY3VycmVudERheSAvIDYwLCBiYWNrZ3JvdW5kQ29sb3I6IENvbG9ycy53aGl0ZTEwLCBjb2xvcjogY29uc3QgQ29sb3IoMHg4RkYxRTI3MCksIG1pbkhlaWdodDogOCksCiAgICAgICAgICAgICAgICBdLAogICAgICAgICAgICAgICksCiAgICAgICAgICAgICksCiAgICAgICAgICAgIGNvbnN0IFNpemVkQm94KGhlaWdodDogMjApLAogICAgICAgICAgICBjb25zdCBUZXh0KCdFR0VETkVWTllFIERJU0NJUExJTFknLCBzdHlsZTogVGV4dFN0eWxlKGZvbnRTaXplOiAxNCwgZm9udFdlaWdodDogRm9udFdlaWdodC5ib2xkLCBjb2xvcjogQ29sb3JzLmdyZXkpKSwKICAgICAgICAgICAgY29uc3QgU2l6ZWRCb3goaGVpZ2h0OiAxMCksCiAgICAgICAgICAgIC4uLl90YXNrcy5tYXAoKHRhc2spID0+IENhcmQoCiAgICAgICAgICAgICAgY29sb3I6IGNvbnN0IENvbG9yKDB4RkYxNDE0MTQpLAogICAgICAgICAgICAgIG1hcmdpbjogY29uc3QgRWRnZUluc2V0cy5vbmx5KGJvdHRvbTogMTApLAogICAgICAgICAgICAgIGNoaWxkOiBDaGVja2JveExpc3RUaWxlKAogICAgICAgICAgICAgICAgdGl0bGU6IFRleHQodGFzay50aXRsZSwgc3R5bGU6IFRleHRTdHlsZShmb250V2VpZ2h0OiBGb250V2VpZ2h0LmJvbGQsIGRlY29yYXRpb246IHRhc2suaXNDb21wbGV0ZWQgP3RleHREZWNvcmF0aW9uLmxpbmVUaHJvdWdoIDogbnVsbCkpLAogICAgICAgICAgICAgICAgc3VidGl0bGU6IFRleHQodGFzay5zdWJ0aXRsZSwgc3R5bGU6IGNvbnN0IFRleHRTdHlsZShjb2xvcl9Db2xvcnMuZ3JleSkpLAogICAgICAgICAgICAgICAgdmFsdWU6IHRhc2suaXNDb21wbGV0ZWQsCiAgICAgICAgICAgICAgICBhY3RpdmVDb2xvcjogY29uc3QgQ29sb3IoMHg4RkYxRTI3MCksCiAgICAgICAgICAgICAgICBjaGVja0NvbG9yOiBDb2xvcnMuYmxhY2ssCiAgICAgICAgICAgICAgICBvbkNoYW5nZWQ6ICh2YWwpIHsKICAgICAgICAgICAgICAgICAgc2V0U3RhdGUoKSB7CiAgICAgICAgICAgICAgICAgICAgdGFzay5pc0NvbXBsZXRlZCA9IHZhbCA/PyBmYWxzZTsKICAgICAgICAgICAgICAgICAgfSk7CiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICksCiAgICAgICAgICAgICkpLAogICAgICAgICAgXSwKICAgICAgICApLAogICAgICApLAogICAgKTsKICB9Cn0=" | base64 -d > app/lib/main.dart
+          echo "import 'package:flutter/material.dart';
+
+          void main() {
+            runApp(const TransformationApp());
+          }
+
+          class TransformationApp extends StatelessWidget {
+            const TransformationApp({super.key});
+
+            @override
+            Widget build(BuildContext context) {
+              return MaterialApp(
+                title: '60 ДНЕЙ ТРАНСФОРМАЦИИ',
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData.dark().copyWith(
+                  scaffoldBackgroundColor: const Color(0xFF0A0A0A),
+                  primaryColor: const Color(0xFF8FF1E2),
+                  colorScheme: const ColorScheme.dark(
+                    primary: Color(0xFF8FF1E2),
+                    surface: Color(0xFF141414),
+                  ),
+                ),
+                home: const DashboardScreen(),
+              );
+            }
+          }
+
+          class HabitItem {
+            final String id;
+            final String title;
+            final String subtitle;
+            final IconData icon;
+            bool isCompleted;
+
+            HabitItem({
+              required this.id,
+              required this.title,
+              required this.subtitle,
+              required this.icon,
+              this.isCompleted = false,
+            });
+          }
+
+          class DashboardScreen extends StatefulWidget {
+            const DashboardScreen({super.key});
+
+            @override
+            State<DashboardScreen> createState() => _DashboardScreenState();
+          }
+
+          class _DashboardScreenState extends State<DashboardScreen> {
+            int currentDay = 1;
+            late List<HabitItem> _tasks;
+
+            @override
+            void initState() {
+              super.initState();
+              _initTasks();
+            }
+
+            void _initTasks() {
+              _tasks = [
+                HabitItem(
+                  id: 'sport',
+                  title: 'Спорт и Тело (1 ЧАП / 60 МИН)',
+                  subtitle: 'Бег, силовая или функционал',
+                  icon: Icons.fitness_center,
+                ),
+                HabitItem(
+                  id: 'read',
+                  title: 'Чтение (20 страниц)',
+                  subtitle: 'Развивающая литература',
+                  icon: Icons.menu_book,
+                ),
+                HabitItem(
+                  id: 'water',
+                  title: 'Дисциплина и Вода (3Л)',
+                  subtitle: 'Без сахара и фастфуда',
+                  icon: Icons.water_drop,
+                ),
+                HabitItem(
+                  id: 'cold',
+                  title: 'Контрастный душ',
+                  subtitle: 'Закаливание каждое утро',
+                  icon: Icons.ac_unit,
+                ),
+              ];
+            }
+
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                appBar: AppBar(
+                  backgroundColor: const Color(0xFF141414),
+                  title: const Text('60 DAYS // HARDCORE', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                  centerTitle: true,
+                ),
+                body: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF141414),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFF8FF1E2), width: 1.5),
+                        ),
+                        child: Column(
+                          children: [
+                            Text('ДЕНЬ ' + currentDay.toString() + ' ИЗ 60', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF8FF1E2))),
+                            const SizedBox(height: 8),
+                            LinearProgressIndicator(value: currentDay / 60, backgroundColor: Colors.white10, color: const Color(0xFF8FF1E2), minHeight: 8),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text('ЕЖЕДНЕВНЫЕ ДИСЦИПЛИНЫ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
+                      const SizedBox(height: 10),
+                      ..._tasks.map((task) => Card(
+                        color: const Color(0xFF141414),
+                        margin: const EdgeInsets.only(bottom: 10),
+                        child: CheckboxListTile(
+                          title: Text(task.title, style: TextStyle(fontWeight: FontWeight.bold, decoration: task.isCompleted ? TextDecoration.lineThrough : null)),
+                          subtitle: Text(task.subtitle, style: const TextStyle(color: Colors.grey)),
+                          value: task.isCompleted,
+                          activeColor: const Color(0xFF8FF1E2),
+                          checkColor: Colors.black,
+                          onChanged: (val) {
+                            setState(() {
+                              task.isCompleted = val ?? false;
+                            });
+                          },
+                        ),
+                      )),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }" > app/lib/main.dart
           cd app
           flutter build apk --release --no-tree-shake-icons
 
