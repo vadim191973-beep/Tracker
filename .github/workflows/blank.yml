@@ -1,17 +1,29 @@
 name: Build Hardcore APK
 on: [push, workflow_dispatch]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - run: |
+
+      - name: Build APK
+        run: |
           flutter create --project-name=transformation app
-          cat << 'EOF' > app/lib/main.dart
-          import 'package:flutter/material.dart';
+          node -e '
+          const fs = require("fs");
+          const code = `import "package:flutter/material.dart";
 
           void main() {
             runApp(const TransformationApp());
@@ -23,7 +35,7 @@ jobs:
             @override
             Widget build(BuildContext context) {
               return MaterialApp(
-                title: '60 ДНЕЙ ТРАНСФОРМАЦИИ',
+                title: "60 ДНЕЙ ТРАНСФОРМАЦИИ",
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData.dark().copyWith(
                   scaffoldBackgroundColor: const Color(0xFF0A0A0A),
@@ -68,33 +80,29 @@ jobs:
             @override
             void initState() {
               super.initState();
-              _initTasks();
-            }
-
-            void _initTasks() {
               _tasks = [
                 HabitItem(
-                  id: 'sport',
-                  title: 'Спорт и Тело (1 ЧАС / 60 МИН)',
-                  subtitle: 'Бег, силовая или функционал',
+                  id: "sport",
+                  title: "Спорт и Тело (1 ЧАС / 60 МИН)",
+                  subtitle: "Бег, силовая или функционал",
                   icon: Icons.fitness_center,
                 ),
                 HabitItem(
-                  id: 'read',
-                  title: 'Чтение (20 страниц)',
-                  subtitle: 'Развивающая литература',
+                  id: "read",
+                  title: "Чтение (20 страниц)",
+                  subtitle: "Развивающая литература",
                   icon: Icons.menu_book,
                 ),
                 HabitItem(
-                  id: 'water',
-                  title: 'Дисциплина и Вода (3L)',
-                  subtitle: 'Без сахара и фастфуда',
+                  id: "water",
+                  title: "Дисциплина и Вода (3L)",
+                  subtitle: "Без сахара и фастфуда",
                   icon: Icons.water_drop,
                 ),
                 HabitItem(
-                  id: 'cold',
-                  title: 'Контрастный душ',
-                  subtitle: 'Закаливание каждое утро',
+                  id: "cold",
+                  title: "Контрастный душ",
+                  subtitle: "Закаливание каждое утро",
                   icon: Icons.ac_unit,
                 ),
               ];
@@ -105,7 +113,7 @@ jobs:
               return Scaffold(
                 appBar: AppBar(
                   backgroundColor: const Color(0xFF141414),
-                  title: const Text('60 DAYS // HARDCORE', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                  title: const Text("60 DAYS // HARDCORE", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                   centerTitle: true,
                 ),
                 body: Padding(
@@ -121,14 +129,14 @@ jobs:
                         ),
                         child: Column(
                           children: [
-                            Text('ДЕНЬ $currentDay ИЗ 60', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.black, color: Color(0xFFF1E270))),
+                            Text("ДЕНЬ $currentDay ИЗ 60", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.black, color: Color(0xFFF1E270))),
                             const SizedBox(height: 8),
                             LinearProgressIndicator(value: currentDay / 60, backgroundColor: Colors.white10, color: const Color(0xFFF1E270), minHeight: 8),
                           ],
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text('ЕЖЕДНЕВНЫЕ ДИСЦИПЛИНЫ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
+                      const Text("ЕЖЕДНЕВНЫЕ ДИСЦИПЛИНЫ", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
                       const SizedBox(height: 10),
                       ..._tasks.map((task) => Card(
                         color: const Color(0xFF141414),
@@ -151,11 +159,14 @@ jobs:
                 ),
               );
             }
-          }
-          EOF
+          }`;
+          fs.writeFileSync("app/lib/main.dart", code);
+          '
           cd app
           flutter build apk --release --no-tree-shake-icons
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: HardcoreTransformation-APK
           path: app/build/app/outputs/flutter-apk/app-release.apk
