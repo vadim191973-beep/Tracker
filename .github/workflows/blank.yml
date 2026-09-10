@@ -9,10 +9,14 @@ jobs:
         with:
           channel: 'stable'
       - run: |
-          flutter create app
-          cp lib/main.dart app/lib/main.dart
+          flutter create --project-name=transformation app
+          if [ -f "lib/main.dart" ]; then
+            cp lib/main.dart app/lib/main.dart
+          elif [ -f "main.dart" ]; then
+            cp main.dart app/lib/main.dart
+          fi
           cd app
-          flutter build apk --release
+          flutter build apk --release --no-tree-shake-icons
       - uses: actions/upload-artifact@v4
         with:
           name: HardcoreTransformation-APK
